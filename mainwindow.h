@@ -9,6 +9,11 @@
 #include <QTimer>
 #include <QDateTime>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QJsonArray>
+
 namespace Ui {
 class MainWindow;
 }
@@ -30,16 +35,21 @@ public:
 
     int minFromValue(float value);
     int gradFromValue(float value);
-
     QPair<int,int> getQuanInGrad(float value);
     void changedData(QSpinBox* grad, QSpinBox* min, QPair<int,int> value);
+
     void calcCoeff();
     void algorithmForMultipleParam();
     void algorithmForSingleParam();
-    void readDataFromFile();
     void assignStartValues();
     void assignUiStartValues();
     void testCompleteProcess();
+    void initFunction();
+    void windowState(int state);
+
+    void writeDataToJson();
+    int readDatafromJson();
+    void readDataFromFile();
 
 private slots:
     void writeDataInFile();
@@ -49,30 +59,38 @@ private slots:
     void backBtnHandler();
     void continueBtnHandler();
     void finishBtnHandler();
+    void loadInfoFromJson();
+    void saveInfoInJson();
 
 private:
     Ui::MainWindow *ui;
 
-    float _ostatok = 0;
+    QString _txtName;
+    int _winStateVar;
+    QTimer *_timer = nullptr;
 
+    //For calcuting value
+    float _ostatok = 0;
     float _incremCoef = 0;
     long long _numsOfValues = 1;
     qint8 _degree = 0;
 
-    QString _txtName;
+    //For algorythm
+    QuantParametrs _shirotaObj;
+    QuantParametrs _dolgotaObj;
+    QuantParametrs _krenObj;
+    QuantParametrs _differentObj;
+    QuantParametrs _kursObj;
+    QuantParametrs *_currentObj = nullptr;
+    int _currentObjIndex;
+    QVector <QuantParametrs*> _selectedQuant;
 
-    QuantParametrs shirotaObj;
-    QuantParametrs dolgotaObj;
-    QuantParametrs krenObj;
-    QuantParametrs differentObj;
-    QuantParametrs kursObj;
-    QuantParametrs *currentObj = nullptr;
-
-    int currentObjIndex;
-
-    QVector <QuantParametrs> selectedQuant;
-
-    QTimer *timer = nullptr;
+    //For JSON
+    QFile _fileJSON;
+    QJsonDocument _doc;
+    QJsonArray _docArr;
+    QString _globalPath = ".\\..\\ty\\savedata.json";
+    QJsonParseError _parsErr;
 
     enum StartQuanParameters
     {
